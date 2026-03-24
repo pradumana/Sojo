@@ -306,7 +306,7 @@
 </div>
 
 <script>
-const API = 'http://localhost:3000/api';
+const API = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 let allData = null;
 
 // ── AUTH GUARD ─────────────────────────────────────────────────
@@ -559,7 +559,7 @@ async function saveBlog() {
     status: document.getElementById('blogStatus').value
   };
 
-  const url = editingBlogId ? `${API}/admin/blogs/${editingBlogId}` : `${API}/admin/blogs`;
+  const url = editingBlogId ? `${API}/admin/blogs?id=${editingBlogId}` : `${API}/admin/blogs`;
   const method = editingBlogId ? 'PUT' : 'POST';
   await authFetch(url, { method, body: JSON.stringify(payload) });
 
@@ -569,7 +569,7 @@ async function saveBlog() {
 
 async function deleteBlog() {
   if (!confirm('Delete this post permanently?')) return;
-  await authFetch(`${API}/admin/blogs/${editingBlogId}`, { method: 'DELETE' });
+  await authFetch(`${API}/admin/blogs?id=${editingBlogId}`, { method: 'DELETE' });
   closeBlogEditor();
 }
 

@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const API = 'http://localhost:3000/api';
+const API = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
 // ===== SESSION =====
 let SESSION_ID = sessionStorage.getItem('sj_session');
