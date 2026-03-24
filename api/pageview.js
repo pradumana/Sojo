@@ -1,4 +1,4 @@
-const { sqlite, sql } = require('./_db');
+const { sqlite, supabase } = require('./_db');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,13 +9,13 @@ module.exports = async (req, res) => {
 
   const { session_id, referrer } = req.body || {};
   const ip = req.headers['x-forwarded-for'] || '';
-  const ua = req.headers['user-agent'] || '';
+  const user_agent = req.headers['user-agent'] || '';
 
   if (sqlite) {
     sqlite.prepare(`INSERT INTO page_views (session_id,referrer,ip,user_agent) VALUES (?,?,?,?)`)
-      .run(session_id||'', referrer||'', ip, ua);
+      .run(session_id || '', referrer || '', ip, user_agent);
   } else {
-    await sql`INSERT INTO page_views (session_id,referrer,ip,user_agent) VALUES (${session_id||''},${referrer||''},${ip},${ua})`;
+    await supabase.from('page_views').insert({ session_id: session_id || '', referrer: referrer || '', ip, user_agent });
   }
   res.json({ success: true });
 };

@@ -1,15 +1,18 @@
 // Database helper
-// - Local dev: better-sqlite3 (fast, no setup)
-// - Vercel production: Neon serverless Postgres (set DATABASE_URL env var)
+// - Local dev:  better-sqlite3 (no setup needed)
+// - Production: Supabase (set SUPABASE_URL + SUPABASE_SERVICE_KEY env vars)
 
 const isVercel = !!process.env.VERCEL;
 
-let sqlite = null;
-let neon   = null;
+let sqlite   = null;
+let supabase = null;
 
 if (isVercel) {
-  const { neon: createNeon } = require('@neondatabase/serverless');
-  neon = createNeon(process.env.DATABASE_URL);
+  const { createClient } = require('@supabase/supabase-js');
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_KEY
+  );
 } else {
   const Database = require('better-sqlite3');
   const path = require('path');
@@ -47,13 +50,4 @@ if (isVercel) {
   `);
 }
 
-// Unified query helper — use tagged template for Neon, prepare() for SQLite
-async function query(strings, ...values) {
-  if (neon) return neon(strings, ...values);
-  // For SQLite, reconstruct the query with ? placeholders
-  let sql = '';
-  strings.forEach((s, i) => { sql += s; if (i < values.length) sql += '?'; });
-  return sqlite.prepare(sql).all(...values);
-}
-
-module.exports = { sqlite, neon, query };
+module.exports = { sqlite, supabase };

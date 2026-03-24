@@ -1,49 +1,43 @@
-# Deploying Social Jobs to Vercel
+# Deploying Social Jobs to Vercel + Supabase
 
-## The Problem with SQLite on Vercel
-Vercel runs **serverless functions** — the filesystem is read-only and ephemeral.
-SQLite won't work. You need a hosted database.
-
-## Recommended Free Stack for Vercel
-
-| Service | What it does | Free tier |
+## Stack
+| Service | Role | Cost |
 |---|---|---|
-| **Vercel** | Hosts HTML + API functions | Free forever |
-| **Supabase** | Postgres database (replaces SQLite) | 500MB free |
+| **Vercel** | Hosts HTML + serverless API | Free |
+| **Supabase** | Postgres database | Free (500MB) |
 
 ---
 
-## Step 1 — Set up Supabase (5 minutes)
+## Step 1 — Set up Supabase (5 min)
 
-1. Go to https://supabase.com and create a free account
-2. Create a new project (pick any region close to India)
-3. Go to **SQL Editor** and run this:
+1. Go to https://supabase.com → create free account → New Project
+2. Choose a region close to India (e.g. Singapore)
+3. Go to **SQL Editor** and run this to create all tables:
 
 ```sql
-CREATE TABLE contacts (
-  id TEXT PRIMARY KEY,
-  name TEXT, email TEXT, interest TEXT, message TEXT, ip TEXT,
+CREATE TABLE IF NOT EXISTS contacts (
+  id TEXT PRIMARY KEY, name TEXT, email TEXT, interest TEXT,
+  message TEXT, ip TEXT, created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS events (
+  id BIGSERIAL PRIMARY KEY, session_id TEXT, event_type TEXT,
+  label TEXT, page_section TEXT, ip TEXT, user_agent TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-CREATE TABLE events (
-  id BIGSERIAL PRIMARY KEY,
-  session_id TEXT, event_type TEXT, label TEXT, page_section TEXT,
-  ip TEXT, user_agent TEXT,
+
+CREATE TABLE IF NOT EXISTS page_views (
+  id BIGSERIAL PRIMARY KEY, session_id TEXT, referrer TEXT,
+  ip TEXT, user_agent TEXT, created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS newsletter (
+  id TEXT PRIMARY KEY, email TEXT UNIQUE, ip TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-CREATE TABLE page_views (
-  id BIGSERIAL PRIMARY KEY,
-  session_id TEXT, referrer TEXT, ip TEXT, user_agent TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE TABLE newsletter (
-  id TEXT PRIMARY KEY,
-  email TEXT UNIQUE, ip TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE TABLE blogs (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL, slug TEXT UNIQUE NOT NULL,
+
+CREATE TABLE IF NOT EXISTS blogs (
+  id TEXT PRIMARY KEY, title TEXT NOT NULL, slug TEXT UNIQUE NOT NULL,
   excerpt TEXT, content TEXT, category TEXT, author TEXT,
   cover_color TEXT DEFAULT 'linear-gradient(135deg,#667eea,#764ba2)',
   status TEXT DEFAULT 'draft',
@@ -52,90 +46,73 @@ CREATE TABLE blogs (
 );
 ```
 
-4. Go to **Settings → API** and copy:
-   - `Project URL` → this is your `SUPABASE_URL`
-   - `service_role` secret key → this is your `SUPABASE_SERVICE_KEY`
+4. Also run these SQL functions (used by the admin stats dashboard):
+
+```sql
+CREATE OR REPLACE FUNCTION top_sections()
+RETURNS TABLE(page_section TEXT, count BIGINT) AS $$
+  SELECT page_section, COUNT(*) as count FROM events
+  WHERE page_section != '' GROUP BY page_section ORDER BY count DESC LIMIT 10;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION top_events()
+RETURNS TABLE(event_type TEXT, label TEXT, count BIGINT) AS $$
+  SELECT event_type, label, COUNT(*) as count FROM events
+  GROUP BY event_type, label ORDER BY count DESC LIMIT 15;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION interest_breakdown()
+RETURNS TABLE(interest TEXT, count BIGINT) AS $$
+  SELECT interest, COUNT(*) as count FROM contacts
+  WHERE interest != '' GROUP BY interest ORDER BY count DESC;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION daily_views()
+RETURNS TABLE(date DATE, count BIGINT) AS $$
+  SELECT DATE(created_at) as date, COUNT(*) as count FROM page_views
+  GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 14;
+$$ LANGUAGE sql;
+```
+
+5. Go to **Settings → API** and copy:
+   - **Project URL** → `SUPABASE_URL`
+   - **service_role** secret key → `SUPABASE_SERVICE_KEY`
 
 ---
 
 ## Step 2 — Deploy to Vercel
 
-### Option A: Via Vercel CLI (recommended)
+### Via GitHub (easiest)
+1. Push this repo to GitHub (already done)
+2. Go to https://vercel.com → New Project → Import `pradumana/Sojo`
+3. Add these **Environment Variables**:
+
+```
+SUPABASE_URL         = https://xxxx.supabase.co
+SUPABASE_SERVICE_KEY = eyJhbGci...  (service_role key)
+ADMIN_EMAIL          = your@email.com
+ADMIN_PASSWORD       = YourStrongPassword123!
+JWT_SECRET           = any-long-random-string-nobody-can-guess
+```
+
+4. Click **Deploy**
+
+---
+
+## URLs after deployment
+
+| Page | URL |
+|---|---|
+| Website | `https://your-site.vercel.app` |
+| Admin Login | `https://your-site.vercel.app/admin-login.html` |
+| Blog Listing | `https://your-site.vercel.app/blogs.html` |
+
+---
+
+## Local development
 
 ```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Inside the socialjobs-website folder:
-vercel
-
-# Follow prompts — say YES to all defaults
-# When asked for environment variables, add:
-#   SUPABASE_URL = your project URL
-#   SUPABASE_SERVICE_KEY = your service_role key
+node server.js
+# → http://localhost:3000
+# Uses local SQLite — no Supabase needed locally
 ```
-
-### Option B: Via GitHub (easiest)
-
-1. Push this folder to a GitHub repo
-2. Go to https://vercel.com → New Project → Import your repo
-3. Set root directory to `socialjobs-website`
-4. Add environment variables:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_KEY`
-5. Click Deploy
-
----
-
-## Step 3 — Update API base URL in frontend
-
-After deploying, update the `API` constant in these files:
-- `script.js` line 2: change `http://localhost:3000/api` → `/api`
-- `admin.html` line ~: change `http://localhost:3000/api` → `/api`
-- `blogs.html`: change `http://localhost:3000/api` → `/api`
-- `blog-post.html`: change `http://localhost:3000/api` → `/api`
-
-Or better — use a single config. Replace the API line in each file with:
-```js
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
-```
-
----
-
-## Step 4 — Swap API functions to use Supabase
-
-Install the Supabase client:
-```bash
-npm install @supabase/supabase-js
-```
-
-Then in each `api/*.js` file, replace the SQLite calls with Supabase calls.
-Example for `api/contact.js`:
-
-```js
-import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
-  const { name, email, interest, message } = req.body;
-  const { error } = await supabase.from('contacts').insert({
-    id: crypto.randomUUID(), name, email, interest, message,
-    ip: req.headers['x-forwarded-for'] || ''
-  });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true });
-}
-```
-
----
-
-## Quick Summary
-
-```
-Local dev:   node server.js  →  http://localhost:3000
-Production:  vercel deploy   →  https://your-site.vercel.app
-Database:    Supabase (free Postgres, no setup needed locally)
-```
-
-Your admin dashboard will be at: `https://your-site.vercel.app/admin.html`

@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { sqlite, sql } = require('./_db');
+const { sqlite, supabase } = require('./_db');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,7 +18,8 @@ module.exports = async (req, res) => {
     sqlite.prepare(`INSERT INTO contacts (id,name,email,interest,message,ip) VALUES (?,?,?,?,?,?)`)
       .run(id, name, email, interest || '', message, ip);
   } else {
-    await sql`INSERT INTO contacts (id,name,email,interest,message,ip) VALUES (${id},${name},${email},${interest||''},${message},${ip})`;
+    const { error } = await supabase.from('contacts').insert({ id, name, email, interest: interest || '', message, ip });
+    if (error) return res.status(500).json({ error: error.message });
   }
   res.json({ success: true });
 };

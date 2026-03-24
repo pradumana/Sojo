@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { sqlite, sql } = require('./_db');
+const { sqlite, supabase } = require('./_db');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,14 +14,15 @@ module.exports = async (req, res) => {
   const id = uuidv4();
   const ip = req.headers['x-forwarded-for'] || '';
 
-  try {
-    if (sqlite) {
+  if (sqlite) {
+    try {
       sqlite.prepare(`INSERT INTO newsletter (id,email,ip) VALUES (?,?,?)`).run(id, email, ip);
-    } else {
-      await sql`INSERT INTO newsletter (id,email,ip) VALUES (${id},${email},${ip})`;
-    }
+      res.json({ success: true });
+    } catch { res.status(409).json({ error: 'Already subscribed' }); }
+  } else {
+    const { error } = await supabase.from('newsletter').insert({ id, email, ip });
+    if (error && error.code === '23505') return res.status(409).json({ error: 'Already subscribed' });
+    if (error) return res.status(500).json({ error: error.message });
     res.json({ success: true });
-  } catch {
-    res.status(409).json({ error: 'Already subscribed' });
   }
 };
