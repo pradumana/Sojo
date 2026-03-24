@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blogs — Social Jobs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .blogs-hero { background: linear-gradient(135deg,#0f0c29,#302b63); padding: 8rem 2rem 4rem; text-align: center; }
+    .blogs-hero h1 { font-family: 'Playfair Display',serif; font-size: clamp(2rem,4vw,3rem); color: white; margin-bottom: 1rem; }
+    .blogs-hero p { color: rgba(255,255,255,0.65); font-size: 1.05rem; max-width: 500px; margin: 0 auto 2rem; }
+    .filter-bar { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+    .filter-btn { padding: 0.45rem 1.1rem; border-radius: 50px; border: 1.5px solid rgba(108,61,232,0.3); background: transparent; color: var(--text-mid); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .filter-btn.active, .filter-btn:hover { background: var(--grad-1); color: white; border-color: transparent; }
+    .blogs-page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 2rem; }
+    .skeleton { background: linear-gradient(90deg, #f0f0f8 25%, #e0e0f0 50%, #f0f0f8 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius); height: 320px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .no-blogs { text-align: center; padding: 4rem; color: var(--text-light); grid-column: 1/-1; }
+    .no-blogs i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  </style>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🌱</span><span class="logo-text">Social<span class="accent">Jobs</span></span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html#about">About Us</a></li>
+      <li><a href="index.html#programs">Our Programs</a></li>
+      <li><a href="index.html#support">Support Us</a></li>
+      <li><a href="blogs.html" style="color:var(--primary);font-weight:600">Blogs</a></li>
+      <li><a href="index.html#careers">Careers</a></li>
+      <li><a href="index.html#contact" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="blogs-hero">
+  <span class="hero-badge">📝 Stories & Insights</span>
+  <h1>Our <span class="gradient-text">Blog</span></h1>
+  <p>Perspectives from the ground — on careers, freelancing, child welfare, and social change.</p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn active" data-cat="all">All</button>
+      <button class="filter-btn" data-cat="Career">Career</button>
+      <button class="filter-btn" data-cat="Freelancing">Freelancing</button>
+      <button class="filter-btn" data-cat="Child Welfare">Child Welfare</button>
+      <button class="filter-btn" data-cat="Impact Story">Impact Story</button>
+      <button class="filter-btn" data-cat="Announcement">Announcement</button>
+    </div>
+    <div class="blogs-page-grid" id="blogsGrid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;display:flex;justify-content:space-between">
+      <p>© 2025 Social Jobs Foundation. Built with ❤️ for a better India.</p>
+      <a href="index.html" style="color:rgba(255,255,255,0.4);font-size:0.82rem">← Back to Home</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const API = 'http://localhost:3000/api';
+let allBlogs = [];
+let activeFilter = 'all';
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+async function loadBlogs() {
+  try {
+    const res = await fetch(`${API}/blogs`);
+    allBlogs = await res.json();
+    renderBlogs();
+  } catch {
+    document.getElementById('blogsGrid').innerHTML = '<div class="no-blogs"><i class="fas fa-exclamation-circle"></i><p>Could not load blogs. Make sure the server is running.</p></div>';
+  }
+}
+
+function renderBlogs() {
+  const filtered = activeFilter === 'all' ? allBlogs : allBlogs.filter(b => b.category === activeFilter);
+  const grid = document.getElementById('blogsGrid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="no-blogs"><i class="fas fa-pen-nib"></i><p>No posts in this category yet.</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(b => `
+    <div class="blog-card" onclick="window.location='blog-post.html?slug=${b.slug}'" style="cursor:pointer">
+      <div class="blog-img" style="background:${b.cover_color}"></div>
+      <div class="blog-body">
+        <span class="blog-tag">${b.category}</span>
+        <h4>${b.title}</h4>
+        <p>${b.excerpt || ''}</p>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.78rem;color:var(--text-light)"><i class="fas fa-user" style="margin-right:0.3rem"></i>${b.author}</span>
+          <a class="blog-link" href="blog-post.html?slug=${b.slug}">Read More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+document.getElementById('filterBar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.cat;
+  renderBlogs();
+});
+
+loadBlogs();
+</script>
+</body>
+</html>

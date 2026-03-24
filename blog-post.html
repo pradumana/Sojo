@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Social Jobs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .post-hero { padding: 8rem 2rem 3rem; text-align: center; }
+    .post-cover { height: 320px; width: 100%; }
+    .post-body { max-width: 740px; margin: 0 auto; padding: 3rem 2rem; }
+    .post-meta { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .post-title { font-family: 'Playfair Display',serif; font-size: clamp(1.8rem,4vw,2.8rem); color: var(--text-dark); line-height: 1.25; margin-bottom: 1.5rem; }
+    .post-content { font-size: 1.05rem; line-height: 1.85; color: var(--text-mid); }
+    .post-content h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 2rem 0 0.75rem; }
+    .post-content h3 { font-size: 1.2rem; font-weight: 600; color: var(--text-dark); margin: 1.5rem 0 0.5rem; }
+    .post-content p { margin-bottom: 1.25rem; }
+    .post-content ul, .post-content ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .post-content li { margin-bottom: 0.4rem; }
+    .post-content a { color: var(--primary); text-decoration: underline; }
+    .post-content strong { color: var(--text-dark); }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 2rem; }
+    .back-link:hover { gap: 0.75rem; }
+    .not-found { text-align: center; padding: 6rem 2rem; color: var(--text-light); }
+    .not-found i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  </style>
+</head>
+<body>
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🌱</span><span class="logo-text">Social<span class="accent">Jobs</span></span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html#about">About Us</a></li>
+      <li><a href="index.html#programs">Our Programs</a></li>
+      <li><a href="blogs.html">Blogs</a></li>
+      <li><a href="index.html#contact" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div id="postContainer"></div>
+
+<footer class="footer" style="margin-top:4rem">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;display:flex;justify-content:space-between">
+      <p>© 2025 Social Jobs Foundation.</p>
+      <a href="blogs.html" style="color:rgba(255,255,255,0.4);font-size:0.82rem">← All Blogs</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const API = 'http://localhost:3000/api';
+
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+async function loadPost() {
+  const slug = new URLSearchParams(window.location.search).get('slug');
+  if (!slug) { showNotFound(); return; }
+  try {
+    const res = await fetch(`${API}/blogs/${slug}`);
+    if (!res.ok) { showNotFound(); return; }
+    const post = await res.json();
+    document.title = `${post.title} — Social Jobs`;
+    document.getElementById('postContainer').innerHTML = `
+      <div class="post-cover" style="background:${post.cover_color}"></div>
+      <div class="post-body">
+        <a href="blogs.html" class="back-link"><i class="fas fa-arrow-left"></i> All Blogs</a>
+        <div class="post-meta">
+          <span class="blog-tag">${post.category}</span>
+          <span style="font-size:0.85rem;color:var(--text-light)"><i class="fas fa-user" style="margin-right:0.3rem"></i>${post.author}</span>
+          <span style="font-size:0.85rem;color:var(--text-light)"><i class="fas fa-calendar" style="margin-right:0.3rem"></i>${new Date(post.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</span>
+        </div>
+        <h1 class="post-title">${post.title}</h1>
+        <div class="post-content">${post.content}</div>
+      </div>`;
+  } catch { showNotFound(); }
+}
+
+function showNotFound() {
+  document.getElementById('postContainer').innerHTML = `
+    <div class="not-found">
+      <i class="fas fa-file-slash"></i>
+      <h2>Post not found</h2>
+      <p>This blog post doesn't exist or may have been removed.</p>
+      <a href="blogs.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-flex">← Back to Blogs</a>
+    </div>`;
+}
+
+loadPost();
+</script>
+</body>
+</html>

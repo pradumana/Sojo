@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Social Jobs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f0c29; color: #e0e0f0; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    /* SIDEBAR */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: #1a1535; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; }
+    .sidebar-logo { font-size: 1.2rem; font-weight: 800; color: white; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .sidebar-logo span { background: linear-gradient(135deg,#a855f7,#ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem; border-radius: 10px; font-size: 0.88rem; font-weight: 500; color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s; }
+    .nav-item:hover, .nav-item.active { background: rgba(168,85,247,0.15); color: white; }
+    .nav-item i { width: 18px; text-align: center; }
+    .sidebar-footer { margin-top: auto; }
+    .sidebar-footer a { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem; border-radius: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.4); transition: all 0.2s; }
+    .sidebar-footer a:hover { color: white; }
+
+    /* MAIN */
+    .main { flex: 1; padding: 2rem; overflow-x: hidden; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+    .topbar h1 { font-size: 1.5rem; font-weight: 700; color: white; }
+    .refresh-btn { display: flex; align-items: center; gap: 0.5rem; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); color: #a855f7; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+    .refresh-btn:hover { background: rgba(168,85,247,0.25); }
+    .last-updated { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-top: 0.25rem; }
+
+    /* PANELS */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* STAT CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #1a1535; border-radius: 14px; padding: 1.25rem; border: 1px solid rgba(255,255,255,0.05); }
+    .stat-card .label { font-size: 0.75rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .stat-card .value { font-size: 2rem; font-weight: 800; color: white; }
+    .stat-card .icon { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .stat-card.purple .icon { color: #a855f7; }
+    .stat-card.pink .icon { color: #ec4899; }
+    .stat-card.green .icon { color: #43e97b; }
+    .stat-card.yellow .icon { color: #ffd200; }
+    .stat-card.blue .icon { color: #4facfe; }
+
+    /* GRID LAYOUT */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+    /* CARDS */
+    .card { background: #1a1535; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.05); }
+    .card h3 { font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card h3 i { color: #a855f7; }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th { text-align: left; padding: 0.6rem 0.75rem; color: rgba(255,255,255,0.4); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    td { padding: 0.65rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* BADGE */
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; }
+    .badge-purple { background: rgba(168,85,247,0.15); color: #a855f7; }
+    .badge-green { background: rgba(67,233,123,0.12); color: #43e97b; }
+    .badge-yellow { background: rgba(255,210,0,0.12); color: #ffd200; }
+    .badge-pink { background: rgba(236,72,153,0.12); color: #ec4899; }
+    .badge-blue { background: rgba(79,172,254,0.12); color: #4facfe; }
+
+    /* BAR CHART */
+    .bar-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .bar-item { display: flex; flex-direction: column; gap: 0.3rem; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+    .bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #6c3de8, #a855f7); transition: width 0.8s ease; }
+
+    /* DAILY CHART */
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; padding-top: 0.5rem; }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .chart-bar { width: 100%; background: linear-gradient(to top, #6c3de8, #a855f7); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.6s ease; }
+    .chart-bar-label { font-size: 0.6rem; color: rgba(255,255,255,0.35); white-space: nowrap; }
+
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 2rem; color: rgba(255,255,255,0.3); font-size: 0.88rem; }
+    .empty i { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 3rem; color: rgba(255,255,255,0.4); }
+    .loading i { font-size: 2rem; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) { .stats-row { grid-template-columns: repeat(3, 1fr); } .grid-3 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* BLOG EDITOR */
+    .tbtn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); padding: 0.35rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.15s; font-family: Inter,sans-serif; }
+    .tbtn:hover { background: rgba(168,85,247,0.2); color: white; border-color: rgba(168,85,247,0.4); }
+    #blogContent:empty:before { content: attr(data-placeholder); color: rgba(255,255,255,0.2); pointer-events: none; }
+    #blogContent h2 { font-size: 1.3rem; font-weight: 700; color: white; margin: 1rem 0 0.5rem; }
+    #blogContent h3 { font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.9); margin: 0.75rem 0 0.4rem; }
+    #blogContent p { margin-bottom: 0.75rem; }
+    #blogContent ul, #blogContent ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    #blogContent a { color: #a855f7; text-decoration: underline; }
+    .color-swatch { height: 32px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+    .color-swatch.active { border-color: white; transform: scale(1.1); }
+    .blog-card-admin { background: #1a1535; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; }
+    .blog-card-admin:hover { border-color: rgba(168,85,247,0.3); transform: translateY(-2px); }
+    .blog-card-cover { height: 100px; }
+    .blog-card-body { padding: 1rem; }
+    .blog-card-body h4 { color: white; font-size: 0.92rem; font-weight: 700; margin-bottom: 0.4rem; line-height: 1.4; }
+    .blog-card-body p { color: rgba(255,255,255,0.45); font-size: 0.78rem; line-height: 1.5; margin-bottom: 0.75rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .blog-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .blog-edit-btn { background: rgba(168,85,247,0.15); border: none; color: #a855f7; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .blog-edit-btn:hover { background: rgba(168,85,247,0.3); }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">🌱 <span>SoJo Admin</span></div>
+    <div class="nav-item active" onclick="showPanel('overview')"><i class="fas fa-chart-pie"></i> Overview</div>
+    <div class="nav-item" onclick="showPanel('blogs')"><i class="fas fa-pen-nib"></i> Blogs</div>
+    <div class="nav-item" onclick="showPanel('contacts')"><i class="fas fa-envelope"></i> Contacts</div>
+    <div class="nav-item" onclick="showPanel('events')"><i class="fas fa-mouse-pointer"></i> Events</div>
+    <div class="nav-item" onclick="showPanel('newsletter')"><i class="fas fa-bell"></i> Newsletter</div>
+    <div class="sidebar-footer">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Website</a>
+      <a href="#" onclick="logout()" style="color:rgba(255,107,107,0.7)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="panelTitle">Overview</h1>
+        <div class="last-updated" id="lastUpdated">Loading...</div>
+      </div>
+      <button class="refresh-btn" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+
+    <div id="loadingState" class="loading"><i class="fas fa-spinner"></i><p style="margin-top:1rem">Loading data...</p></div>
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-row" id="statsRow"></div>
+      <div class="grid-2">
+        <div class="card" id="dailyChart"><h3><i class="fas fa-chart-bar"></i> Daily Page Views (14 days)</h3><div id="chartContent"></div></div>
+        <div class="card" id="topSectionsCard"><h3><i class="fas fa-fire"></i> Most Visited Sections</h3><div id="topSectionsContent"></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><h3><i class="fas fa-tags"></i> Interest Breakdown</h3><div id="interestContent"></div></div>
+        <div class="card"><h3><i class="fas fa-cursor"></i> Top Interactions</h3><div id="topEventsContent"></div></div>
+      </div>
+    </div>
+
+    <!-- BLOGS -->
+    <div class="panel" id="panel-blogs">
+      <!-- Blog List View -->
+      <div id="blogListView">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <div>
+            <h2 style="color:white;font-size:1.1rem;font-weight:700">All Blog Posts</h2>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.82rem;margin-top:0.2rem">Write, edit and publish posts that appear on the website</p>
+          </div>
+          <button class="refresh-btn" onclick="openBlogEditor(null)" style="background:linear-gradient(135deg,#6c3de8,#a855f7);border:none;color:white">
+            <i class="fas fa-plus"></i> New Post
+          </button>
+        </div>
+        <div id="blogCardsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem"></div>
+      </div>
+
+      <!-- Blog Editor View -->
+      <div id="blogEditorView" style="display:none">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem">
+          <button onclick="closeBlogEditor()" style="background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.7);padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem"><i class="fas fa-arrow-left"></i> Back</button>
+          <h2 id="editorTitle" style="color:white;font-size:1.1rem;font-weight:700">New Blog Post</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start">
+          <!-- Editor Left -->
+          <div style="display:flex;flex-direction:column;gap:1rem">
+            <div class="card" style="padding:1.25rem">
+              <input id="blogTitle" type="text" placeholder="Post title..." style="width:100%;background:transparent;border:none;outline:none;font-size:1.4rem;font-weight:700;color:white;font-family:Inter,sans-serif;margin-bottom:0.75rem" />
+              <input id="blogExcerpt" type="text" placeholder="Short excerpt / summary..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.6rem 0.9rem;color:rgba(255,255,255,0.8);font-size:0.88rem;outline:none;font-family:Inter,sans-serif" />
+            </div>
+            <div class="card" style="padding:0">
+              <div id="editorToolbar" style="display:flex;flex-wrap:wrap;gap:0.25rem;padding:0.75rem;border-bottom:1px solid rgba(255,255,255,0.06)">
+                <button onclick="fmt('bold')" title="Bold" class="tbtn"><i class="fas fa-bold"></i></button>
+                <button onclick="fmt('italic')" title="Italic" class="tbtn"><i class="fas fa-italic"></i></button>
+                <button onclick="fmt('underline')" title="Underline" class="tbtn"><i class="fas fa-underline"></i></button>
+                <div style="width:1px;background:rgba(255,255,255,0.1);margin:0 0.25rem"></div>
+                <button onclick="fmtBlock('h2')" title="Heading 2" class="tbtn">H2</button>
+                <button onclick="fmtBlock('h3')" title="Heading 3" class="tbtn">H3</button>
+                <button onclick="fmtBlock('p')" title="Paragraph" class="tbtn"><i class="fas fa-paragraph"></i></button>
+                <div style="width:1px;background:rgba(255,255,255,0.1);margin:0 0.25rem"></div>
+                <button onclick="fmt('insertUnorderedList')" title="Bullet List" class="tbtn"><i class="fas fa-list-ul"></i></button>
+                <button onclick="fmt('insertOrderedList')" title="Numbered List" class="tbtn"><i class="fas fa-list-ol"></i></button>
+                <div style="width:1px;background:rgba(255,255,255,0.1);margin:0 0.25rem"></div>
+                <button onclick="insertLink()" title="Insert Link" class="tbtn"><i class="fas fa-link"></i></button>
+                <button onclick="fmt('removeFormat')" title="Clear Format" class="tbtn"><i class="fas fa-eraser"></i></button>
+              </div>
+              <div id="blogContent" contenteditable="true"
+                style="min-height:360px;padding:1.25rem;color:rgba(255,255,255,0.85);font-size:0.92rem;line-height:1.8;outline:none;font-family:Inter,sans-serif"
+                data-placeholder="Start writing your blog post here..."></div>
+            </div>
+          </div>
+          <!-- Editor Right (Settings) -->
+          <div style="display:flex;flex-direction:column;gap:1rem">
+            <div class="card">
+              <h3 style="margin-bottom:1rem"><i class="fas fa-cog"></i> Post Settings</h3>
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                <div>
+                  <label style="font-size:0.78rem;color:rgba(255,255,255,0.45);display:block;margin-bottom:0.3rem">STATUS</label>
+                  <select id="blogStatus" style="width:100%;background:#0f0c29;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.55rem 0.75rem;color:white;font-size:0.88rem;outline:none">
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.78rem;color:rgba(255,255,255,0.45);display:block;margin-bottom:0.3rem">CATEGORY</label>
+                  <select id="blogCategory" style="width:100%;background:#0f0c29;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.55rem 0.75rem;color:white;font-size:0.88rem;outline:none">
+                    <option>Career</option>
+                    <option>Freelancing</option>
+                    <option>Child Welfare</option>
+                    <option>Impact Story</option>
+                    <option>Announcement</option>
+                    <option>General</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.78rem;color:rgba(255,255,255,0.45);display:block;margin-bottom:0.3rem">AUTHOR</label>
+                  <input id="blogAuthor" type="text" value="Social Jobs Team" style="width:100%;background:#0f0c29;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.55rem 0.75rem;color:white;font-size:0.88rem;outline:none;font-family:Inter,sans-serif" />
+                </div>
+                <div>
+                  <label style="font-size:0.78rem;color:rgba(255,255,255,0.45);display:block;margin-bottom:0.5rem">COVER COLOR</label>
+                  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem" id="colorPicker">
+                    <div class="color-swatch active" data-grad="linear-gradient(135deg,#667eea,#764ba2)" style="background:linear-gradient(135deg,#667eea,#764ba2)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#f7971e,#ffd200)" style="background:linear-gradient(135deg,#f7971e,#ffd200)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#43e97b,#38f9d7)" style="background:linear-gradient(135deg,#43e97b,#38f9d7)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#f093fb,#f5576c)" style="background:linear-gradient(135deg,#f093fb,#f5576c)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#4facfe,#00f2fe)" style="background:linear-gradient(135deg,#4facfe,#00f2fe)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#ff6b6b,#ffd200)" style="background:linear-gradient(135deg,#ff6b6b,#ffd200)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#0f0c29,#302b63)" style="background:linear-gradient(135deg,#0f0c29,#302b63)"></div>
+                    <div class="color-swatch" data-grad="linear-gradient(135deg,#11998e,#38ef7d)" style="background:linear-gradient(135deg,#11998e,#38ef7d)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem">
+              <button id="saveBlogBtn" onclick="saveBlog()" style="background:linear-gradient(135deg,#6c3de8,#a855f7);border:none;color:white;padding:0.75rem;border-radius:10px;font-weight:700;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem">
+                <i class="fas fa-save"></i> Save Post
+              </button>
+              <button id="deleteBlogBtn" onclick="deleteBlog()" style="display:none;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);color:#ff6b6b;padding:0.65rem;border-radius:10px;font-weight:600;font-size:0.85rem;cursor:pointer">
+                <i class="fas fa-trash"></i> Delete Post
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div class="panel" id="panel-contacts">
+      <div class="card">
+        <h3><i class="fas fa-inbox"></i> Contact Form Submissions</h3>
+        <div class="table-wrap"><table id="contactsTable">
+          <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Interest</th><th>Message</th><th>Date</th></tr></thead>
+          <tbody id="contactsBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="panel" id="panel-events">
+      <div class="card">
+        <h3><i class="fas fa-stream"></i> Recent Interactions</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>#</th><th>Type</th><th>Label</th><th>Section</th><th>Session</th><th>Time</th></tr></thead>
+          <tbody id="eventsBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="panel" id="panel-newsletter">
+      <div class="card">
+        <h3><i class="fas fa-envelope-open"></i> Newsletter Subscribers</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>#</th><th>Email</th><th>IP</th><th>Subscribed On</th></tr></thead>
+          <tbody id="newsletterBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API = 'http://localhost:3000/api';
+let allData = null;
+
+// ── AUTH GUARD ─────────────────────────────────────────────────
+const TOKEN = sessionStorage.getItem('sj_admin_token');
+if (!TOKEN) { window.location.href = 'admin-login.html'; }
+
+// Verify token is still valid on load
+fetch(`${API}/auth/verify`, { headers: { Authorization: `Bearer ${TOKEN}` } })
+  .then(r => { if (!r.ok) logout(); })
+  .catch(() => {});
+
+function logout() {
+  sessionStorage.removeItem('sj_admin_token');
+  window.location.href = 'admin-login.html';
+}
+
+// Authenticated fetch wrapper
+function authFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    headers: { ...(options.headers || {}), Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' }
+  }).then(res => {
+    if (res.status === 401) { logout(); }
+    return res;
+  });
+}
+
+const panels = ['overview','blogs','contacts','events','newsletter'];
+const titles = { overview:'Overview', blogs:'Blog Manager', contacts:'Contact Submissions', events:'User Events', newsletter:'Newsletter Subscribers' };
+
+function showPanel(name) {
+  panels.forEach(p => {
+    document.getElementById(`panel-${p}`).classList.remove('active');
+    document.querySelectorAll('.nav-item').forEach((el,i) => { if(panels[i]===name) el.classList.add('active'); else el.classList.remove('active'); });
+  });
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.getElementById('panelTitle').textContent = titles[name];
+}
+
+function fmt(dt) {
+  if (!dt) return '—';
+  const d = new Date(dt);
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) + ' ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+}
+
+function badgeColor(type) {
+  const map = { section_view:'badge-blue', cta_click:'badge-purple', tab_click:'badge-yellow', form_submit:'badge-green', menu_open:'badge-pink', scroll_top:'badge-pink', newsletter_signup:'badge-green' };
+  return map[type] || 'badge-purple';
+}
+
+function renderStats(s) {
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card purple"><div class="icon"><i class="fas fa-eye"></i></div><div class="label">Page Views</div><div class="value">${s.totalViews}</div></div>
+    <div class="stat-card blue"><div class="icon"><i class="fas fa-users"></i></div><div class="label">Unique Sessions</div><div class="value">${s.uniqueSessions}</div></div>
+    <div class="stat-card green"><div class="icon"><i class="fas fa-envelope"></i></div><div class="label">Contacts</div><div class="value">${s.totalContacts}</div></div>
+    <div class="stat-card yellow"><div class="icon"><i class="fas fa-mouse-pointer"></i></div><div class="label">Total Events</div><div class="value">${s.totalEvents}</div></div>
+    <div class="stat-card pink"><div class="icon"><i class="fas fa-bell"></i></div><div class="label">Subscribers</div><div class="value">${s.subscribers}</div></div>
+  `;
+}
+
+function renderDailyChart(views) {
+  if (!views.length) { document.getElementById('chartContent').innerHTML = '<div class="empty"><i class="fas fa-chart-bar"></i>No data yet</div>'; return; }
+  const max = Math.max(...views.map(v => v.count), 1);
+  const reversed = [...views].reverse();
+  document.getElementById('chartContent').innerHTML = `
+    <div class="chart-bars">
+      ${reversed.map(v => `
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:${Math.max((v.count/max)*90,4)}px" title="${v.count} views"></div>
+          <div class="chart-bar-label">${v.date.slice(5)}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderBarList(items, labelKey, countKey, containerId) {
+  const el = document.getElementById(containerId);
+  if (!items.length) { el.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i>No data yet</div>'; return; }
+  const max = Math.max(...items.map(i => i[countKey]), 1);
+  el.innerHTML = `<div class="bar-list">${items.map(item => `
+    <div class="bar-item">
+      <div class="bar-label"><span>${item[labelKey]}</span><span>${item[countKey]}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(item[countKey]/max)*100}%"></div></div>
+    </div>`).join('')}</div>`;
+}
+
+function renderTopEvents(events) {
+  const el = document.getElementById('topEventsContent');
+  if (!events.length) { el.innerHTML = '<div class="empty"><i class="fas fa-mouse-pointer"></i>No events yet</div>'; return; }
+  el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Type</th><th>Label</th><th>Count</th></tr></thead>
+    <tbody>${events.map(e => `<tr>
+      <td><span class="badge ${badgeColor(e.event_type)}">${e.event_type}</span></td>
+      <td>${e.label || '—'}</td>
+      <td><strong>${e.count}</strong></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function renderContacts(contacts) {
+  const body = document.getElementById('contactsBody');
+  if (!contacts.length) { body.innerHTML = '<tr><td colspan="6"><div class="empty"><i class="fas fa-inbox"></i>No submissions yet</div></td></tr>'; return; }
+  body.innerHTML = contacts.map((c, i) => `<tr>
+    <td>${i+1}</td>
+    <td><strong>${c.name}</strong></td>
+    <td>${c.email}</td>
+    <td><span class="badge badge-purple">${c.interest || '—'}</span></td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.message}">${c.message}</td>
+    <td style="white-space:nowrap">${fmt(c.created_at)}</td>
+  </tr>`).join('');
+}
+
+function renderEvents(events) {
+  const body = document.getElementById('eventsBody');
+  if (!events.length) { body.innerHTML = '<tr><td colspan="6"><div class="empty"><i class="fas fa-stream"></i>No events yet</div></td></tr>'; return; }
+  body.innerHTML = events.map((e, i) => `<tr>
+    <td>${i+1}</td>
+    <td><span class="badge ${badgeColor(e.event_type)}">${e.event_type}</span></td>
+    <td>${e.label || '—'}</td>
+    <td>${e.page_section || '—'}</td>
+    <td style="font-size:0.75rem;color:rgba(255,255,255,0.4)">${e.session_id.slice(0,12)}...</td>
+    <td style="white-space:nowrap">${fmt(e.created_at)}</td>
+  </tr>`).join('');
+}
+
+function renderNewsletter(list) {
+  const body = document.getElementById('newsletterBody');
+  if (!list.length) { body.innerHTML = '<tr><td colspan="4"><div class="empty"><i class="fas fa-bell"></i>No subscribers yet</div></td></tr>'; return; }
+  body.innerHTML = list.map((n, i) => `<tr>
+    <td>${i+1}</td>
+    <td><strong>${n.email}</strong></td>
+    <td style="font-size:0.78rem;color:rgba(255,255,255,0.4)">${n.ip}</td>
+    <td style="white-space:nowrap">${fmt(n.created_at)}</td>
+  </tr>`).join('');
+}
+
+async function loadData() {
+  document.getElementById('loadingState').style.display = 'block';
+  try {
+    const res = await authFetch(`${API}/admin/stats`);
+    allData = await res.json();
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+
+    renderStats(allData.summary);
+    renderDailyChart(allData.dailyViews);
+    renderBarList(allData.topSections, 'page_section', 'count', 'topSectionsContent');
+    renderBarList(allData.interestBreakdown, 'interest', 'count', 'interestContent');
+    renderTopEvents(allData.topEvents);
+    renderContacts(allData.recentContacts);
+    renderEvents(allData.recentEvents);
+    renderNewsletter(allData.newsletterList);
+  } catch(err) {
+    document.getElementById('loadingState').innerHTML = `
+      <i class="fas fa-exclamation-triangle" style="color:#ff6b6b"></i>
+      <p style="margin-top:1rem;color:rgba(255,255,255,0.5)">Cannot connect to server.<br>Run <code style="background:rgba(255,255,255,0.1);padding:0.2rem 0.5rem;border-radius:4px">node server.js</code> in the project folder.</p>`;
+  }
+}
+
+// Auto-refresh every 30 seconds
+loadData();
+setInterval(loadData, 30000);
+
+// ===== BLOG MANAGER =====
+let editingBlogId = null;
+let selectedGrad = 'linear-gradient(135deg,#667eea,#764ba2)';
+
+async function loadBlogs() {
+  const res = await authFetch(`${API}/admin/blogs`);
+  const blogs = await res.json();
+  const grid = document.getElementById('blogCardsGrid');
+  if (!blogs.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-pen-nib"></i><p>No blog posts yet. Click "New Post" to write your first one.</p></div>';
+    return;
+  }
+  grid.innerHTML = blogs.map(b => `
+    <div class="blog-card-admin">
+      <div class="blog-card-cover" style="background:${b.cover_color}"></div>
+      <div class="blog-card-body">
+        <h4>${b.title}</h4>
+        <p>${b.excerpt || 'No excerpt'}</p>
+        <div class="blog-card-footer">
+          <div style="display:flex;gap:0.4rem">
+            <span class="badge ${b.status==='published'?'badge-green':'badge-yellow'}">${b.status}</span>
+            <span class="badge badge-purple">${b.category}</span>
+          </div>
+          <button class="blog-edit-btn" onclick="openBlogEditor('${b.id}')"><i class="fas fa-edit"></i> Edit</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function openBlogEditor(id) {
+  editingBlogId = id;
+  document.getElementById('blogListView').style.display = 'none';
+  document.getElementById('blogEditorView').style.display = 'block';
+  document.getElementById('deleteBlogBtn').style.display = id ? 'block' : 'none';
+  document.getElementById('editorTitle').textContent = id ? 'Edit Blog Post' : 'New Blog Post';
+
+  if (id) {
+    const res = await authFetch(`${API}/admin/blogs`);
+    const blogs = await res.json();
+    const b = blogs.find(x => x.id === id);
+    if (b) {
+      document.getElementById('blogTitle').value = b.title;
+      document.getElementById('blogExcerpt').value = b.excerpt || '';
+      document.getElementById('blogContent').innerHTML = b.content;
+      document.getElementById('blogStatus').value = b.status;
+      document.getElementById('blogCategory').value = b.category;
+      document.getElementById('blogAuthor').value = b.author;
+      selectedGrad = b.cover_color;
+      document.querySelectorAll('.color-swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.grad === b.cover_color);
+      });
+    }
+  } else {
+    document.getElementById('blogTitle').value = '';
+    document.getElementById('blogExcerpt').value = '';
+    document.getElementById('blogContent').innerHTML = '';
+    document.getElementById('blogStatus').value = 'draft';
+    document.getElementById('blogCategory').value = 'Career';
+    document.getElementById('blogAuthor').value = 'Social Jobs Team';
+    selectedGrad = 'linear-gradient(135deg,#667eea,#764ba2)';
+    document.querySelectorAll('.color-swatch').forEach((s,i) => s.classList.toggle('active', i===0));
+  }
+}
+
+function closeBlogEditor() {
+  document.getElementById('blogListView').style.display = 'block';
+  document.getElementById('blogEditorView').style.display = 'none';
+  editingBlogId = null;
+  loadBlogs();
+}
+
+async function saveBlog() {
+  const btn = document.getElementById('saveBlogBtn');
+  const title = document.getElementById('blogTitle').value.trim();
+  const content = document.getElementById('blogContent').innerHTML.trim();
+  if (!title || !content) { alert('Title and content are required.'); return; }
+
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  btn.disabled = true;
+
+  const payload = {
+    title,
+    excerpt: document.getElementById('blogExcerpt').value.trim(),
+    content,
+    category: document.getElementById('blogCategory').value,
+    author: document.getElementById('blogAuthor').value,
+    cover_color: selectedGrad,
+    status: document.getElementById('blogStatus').value
+  };
+
+  const url = editingBlogId ? `${API}/admin/blogs/${editingBlogId}` : `${API}/admin/blogs`;
+  const method = editingBlogId ? 'PUT' : 'POST';
+  await authFetch(url, { method, body: JSON.stringify(payload) });
+
+  btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+  setTimeout(() => { btn.innerHTML = '<i class="fas fa-save"></i> Save Post'; btn.disabled = false; }, 1500);
+}
+
+async function deleteBlog() {
+  if (!confirm('Delete this post permanently?')) return;
+  await authFetch(`${API}/admin/blogs/${editingBlogId}`, { method: 'DELETE' });
+  closeBlogEditor();
+}
+
+// Toolbar helpers
+function fmt(cmd) { document.getElementById('blogContent').focus(); document.execCommand(cmd, false, null); }
+function fmtBlock(tag) { document.getElementById('blogContent').focus(); document.execCommand('formatBlock', false, tag); }
+function insertLink() {
+  const url = prompt('Enter URL:');
+  if (url) { document.getElementById('blogContent').focus(); document.execCommand('createLink', false, url); }
+}
+
+// Color swatches
+document.querySelectorAll('.color-swatch').forEach(s => {
+  s.addEventListener('click', () => {
+    document.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('active'));
+    s.classList.add('active');
+    selectedGrad = s.dataset.grad;
+  });
+});
+
+// Load blogs when panel opens
+const origShowPanel = showPanel;
+window.showPanel = function(name) {
+  origShowPanel(name);
+  if (name === 'blogs') loadBlogs();
+};
+</script>
+</body>
+</html>
