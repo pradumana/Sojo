@@ -115,7 +115,7 @@
   // If already logged in, redirect straight to dashboard
   const token = sessionStorage.getItem('sj_admin_token');
   if (token) {
-    fetch(`${API}/auth/verify`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API}/verify`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(d => { if (d.valid) window.location.href = 'admin.html'; })
       .catch(() => {});
@@ -142,7 +142,7 @@
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
     try {
-      const res  = await fetch(`${API}/auth/login`, {
+      const res  = await fetch(`${API}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

@@ -1,14 +1,3 @@
 {
-  "version": 2,
-  "rewrites": [
-    { "source": "/api/auth/login",    "destination": "/api/login" },
-    { "source": "/api/auth/verify",   "destination": "/api/verify" },
-    { "source": "/api/contact",       "destination": "/api/contact" },
-    { "source": "/api/event",         "destination": "/api/event" },
-    { "source": "/api/pageview",      "destination": "/api/pageview" },
-    { "source": "/api/newsletter",    "destination": "/api/newsletter" },
-    { "source": "/api/blogs",         "destination": "/api/blogs" },
-    { "source": "/api/admin/stats",   "destination": "/api/admin/stats" },
-    { "source": "/api/admin/blogs",   "destination": "/api/admin/blogs" }
-  ]
+  "version": 2
 }

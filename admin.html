@@ -314,7 +314,7 @@ const TOKEN = sessionStorage.getItem('sj_admin_token');
 if (!TOKEN) { window.location.href = 'admin-login.html'; }
 
 // Verify token is still valid on load
-fetch(`${API}/auth/verify`, { headers: { Authorization: `Bearer ${TOKEN}` } })
+fetch(`${API}/verify`, { headers: { Authorization: `Bearer ${TOKEN}` } })
   .then(r => { if (!r.ok) logout(); })
   .catch(() => {});
 

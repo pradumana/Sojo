@@ -1,26 +1,16 @@
-// Shared auth helper for all API functions
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'SoJo$F0und@tion#2026!xK9mPqR3vL7nW2';
-
-function verifyToken(req) {
-  const auth = req.headers['authorization'] || '';
+function requireAuth(req, res) {
+  const JWT_SECRET = process.env.JWT_SECRET || 'SoJo$F0und@tion#2026!xK9mPqR3vL7nW2';
+  const auth  = req.headers['authorization'] || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-  if (!token) return null;
+  if (!token) { res.status(401).json({ error: 'Unauthorized' }); return null; }
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
     return null;
   }
 }
 
-function requireAuth(req, res) {
-  const admin = verifyToken(req);
-  if (!admin) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return null;
-  }
-  return admin;
-}
-
-module.exports = { verifyToken, requireAuth, JWT_SECRET };
+module.exports = { requireAuth };
