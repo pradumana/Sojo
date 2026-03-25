@@ -1,7 +1,7 @@
 // Shared auth helper for all API functions
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'sojo-super-secret-jwt-key-change-in-prod';
+const JWT_SECRET = process.env.JWT_SECRET || 'SoJo$F0und@tion#2026!xK9mPqR3vL7nW2';
 
 function verifyToken(req) {
   const auth = req.headers['authorization'] || '';

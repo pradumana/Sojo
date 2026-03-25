@@ -90,9 +90,9 @@ $$ LANGUAGE sql;
 ```
 SUPABASE_URL         = https://xxxx.supabase.co
 SUPABASE_SERVICE_KEY = eyJhbGci...  (service_role key)
-ADMIN_EMAIL          = your@email.com
-ADMIN_PASSWORD       = YourStrongPassword123!
-JWT_SECRET           = any-long-random-string-nobody-can-guess
+ADMIN_EMAIL          = socialsambhawana@gmail.com
+ADMIN_PASSWORD       = Sojo@2026
+JWT_SECRET           = SoJo$F0und@tion#2026!xK9mPqR3vL7nW2
 ```
 
 4. Click **Deploy**

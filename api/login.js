@@ -2,8 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./_auth');
 
-const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'admin@socialjobs.in';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SoJo@2025!';
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'socialsambhawana@gmail.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sojo@2026';
 const ADMIN_HASH     = bcrypt.hashSync(ADMIN_PASSWORD, 10);
 
 module.exports = async (req, res) => {

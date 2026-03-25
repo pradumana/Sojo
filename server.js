@@ -12,9 +12,9 @@ const PORT = 3000;
 
 // ── CONFIG ────────────────────────────────────────────────────
 // Change these before deploying! Store in env vars in production.
-const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'admin@socialjobs.in';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SoJo@2025!';   // plain text only for local dev
-const JWT_SECRET     = process.env.JWT_SECRET     || 'sojo-super-secret-jwt-key-change-in-prod';
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'socialsambhawana@gmail.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sojo@2026';
+const JWT_SECRET     = process.env.JWT_SECRET     || 'SoJo$F0und@tion#2026!xK9mPqR3vL7nW2';
 const JWT_EXPIRES    = '8h';
 
 // Hash the password once at startup (so we never compare plain text)
