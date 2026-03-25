@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS blogs (
 2. Add these **Environment Variables**:
 
 ```
-DATABASE_URL   = postgresql://postgres:[YOUR-PASSWORD]@db.nefbqenwcrpezudcwecq.supabase.co:5432/postgres
+DATABASE_URL   = postgresql://postgres:GJDW89hNcCq0RUPg@db.nefbqenwcrpezudcwecq.supabase.co:5432/postgres
 ADMIN_EMAIL    = socialsambhawana@gmail.com
 ADMIN_PASSWORD = Sojo@2026
 JWT_SECRET     = SoJo$F0und@tion#2026!xK9mPqR3vL7nW2
