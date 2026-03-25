@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { sqlite, supabase } = require('./_db');
+const { query } = require('./_db');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,15 +11,13 @@ module.exports = async (req, res) => {
   const { name, email, interest, message } = req.body || {};
   if (!name || !email || !message) return res.status(400).json({ error: 'Missing fields' });
 
-  const id = uuidv4();
-  const ip = req.headers['x-forwarded-for'] || '';
-
-  if (sqlite) {
-    sqlite.prepare(`INSERT INTO contacts (id,name,email,interest,message,ip) VALUES (?,?,?,?,?,?)`)
-      .run(id, name, email, interest || '', message, ip);
-  } else {
-    const { error } = await supabase.from('contacts').insert({ id, name, email, interest: interest || '', message, ip });
-    if (error) return res.status(500).json({ error: error.message });
+  try {
+    await query(
+      `INSERT INTO contacts (id,name,email,interest,message,ip) VALUES ($1,$2,$3,$4,$5,$6)`,
+      [uuidv4(), name, email, interest || '', message, req.headers['x-forwarded-for'] || '']
+    );
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
-  res.json({ success: true });
 };

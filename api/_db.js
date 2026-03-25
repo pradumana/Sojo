@@ -1,18 +1,18 @@
 // Database helper
-// - Local dev:  better-sqlite3 (no setup needed)
-// - Production: Supabase (set SUPABASE_URL + SUPABASE_SERVICE_KEY env vars)
+// - Local dev:  better-sqlite3 (zero setup)
+// - Production: Supabase Postgres via pg (set DATABASE_URL env var)
 
 const isVercel = !!process.env.VERCEL;
 
-let sqlite   = null;
-let supabase = null;
+let sqlite = null;
+let pgPool  = null;
 
 if (isVercel) {
-  const { createClient } = require('@supabase/supabase-js');
-  supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
+  const { Pool } = require('pg');
+  pgPool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
 } else {
   const Database = require('better-sqlite3');
   const path = require('path');
@@ -50,4 +50,19 @@ if (isVercel) {
   `);
 }
 
-module.exports = { sqlite, supabase };
+// Unified query: use pg on Vercel, sqlite locally
+async function query(text, params = []) {
+  if (pgPool) {
+    const result = await pgPool.query(text, params);
+    return result.rows;
+  }
+  // Convert $1,$2... placeholders to ? for SQLite
+  let i = 0;
+  const sqliteQuery = text.replace(/\$\d+/g, () => { i++; return '?'; });
+  const stmt = sqlite.prepare(sqliteQuery);
+  // Use .all() for SELECT, .run() for INSERT/UPDATE/DELETE
+  const isSelect = text.trim().toUpperCase().startsWith('SELECT');
+  return isSelect ? stmt.all(...params) : stmt.run(...params);
+}
+
+module.exports = { sqlite, pgPool, query };
