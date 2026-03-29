@@ -6,6 +6,11 @@ a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
 img { max-width: 100%; }
 
+/* ===== FINGER PAINT FONT ===== */
+h1, h2, h3, .nav-logo .logo-text, .btn, .btn-sm, .btn-program, .btn-white, .btn-outline, .btn-outline-dark, .btn-primary {
+  font-family: 'Finger Paint', cursive;
+}
+
 /* ===== CSS VARIABLES ===== */
 :root {
   --primary: #6c3de8;
@@ -64,7 +69,7 @@ img { max-width: 100%; }
 }
 .hero-content { max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 1; }
 .hero-badge { display: inline-block; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.85rem; font-weight: 500; margin-bottom: 1.5rem; backdrop-filter: blur(10px); }
-.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); color: white; line-height: 1.2; margin-bottom: 1.5rem; }
+.hero h1 { font-family: 'Finger Paint', cursive; font-size: clamp(2.2rem, 4vw, 3.5rem); color: white; line-height: 1.2; margin-bottom: 1.5rem; }
 .gradient-text { background: linear-gradient(135deg, #f7971e, #ffd200, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .hero p { color: rgba(255,255,255,0.75); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem; }
 .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
@@ -103,9 +108,9 @@ img { max-width: 100%; }
 .container { max-width: 1200px; margin: 0 auto; }
 .section-header { text-align: center; margin-bottom: 4rem; }
 .section-tag { display: inline-block; background: linear-gradient(135deg, rgba(108,61,232,0.1), rgba(168,85,247,0.1)); color: var(--primary); padding: 0.35rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
-.section-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.8rem); color: var(--text-dark); margin-bottom: 1rem; }
+.section-header h2 { font-family: 'Finger Paint', cursive; font-size: clamp(1.8rem, 3vw, 2.8rem); color: var(--text-dark); margin-bottom: 1rem; }
 .section-header p { color: var(--text-mid); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
-.sub-heading { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--text-dark); margin-bottom: 2rem; text-align: center; }
+.sub-heading { font-family: 'Finger Paint', cursive; font-size: 1.6rem; color: var(--text-dark); margin-bottom: 2rem; text-align: center; }
 
 /* ===== ABOUT ===== */
 .mv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 4rem; }
