@@ -15,7 +15,5 @@
     "pg": "^8.20.0",
     "uuid": "^9.0.0"
   },
-  "devDependencies": {
-    "better-sqlite3": "^9.4.3"
-  }
+  "devDependencies": {}
 }
