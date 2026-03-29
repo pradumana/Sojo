@@ -219,3 +219,73 @@ const statsObserver = new IntersectionObserver((entries) => {
 
 const statsEl = document.querySelector('.hero-stats');
 if (statsEl) statsObserver.observe(statsEl);
+
+// ===== APPLICATION MODAL =====
+const applyModal = document.getElementById('applyModal');
+const modalClose = document.getElementById('modalClose');
+
+document.querySelectorAll('.apply-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const position = btn.dataset.position;
+    document.getElementById('applyPosition').value = position;
+    document.getElementById('modalTitle').textContent = 'Apply Now';
+    document.getElementById('modalSubtitle').textContent = position;
+    document.getElementById('applySuccess').classList.remove('show');
+    document.getElementById('applyForm').reset();
+    document.getElementById('applyPosition').value = position;
+    applyModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    track('apply_open', position, 'careers');
+  });
+});
+
+modalClose.addEventListener('click', closeModal);
+applyModal.addEventListener('click', (e) => { if (e.target === applyModal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+function closeModal() {
+  applyModal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('applyForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('button[type="submit"]');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+  btn.disabled = true;
+
+  const payload = {
+    position: document.getElementById('applyPosition').value,
+    name:     document.getElementById('applyName').value.trim(),
+    email:    document.getElementById('applyEmail').value.trim(),
+    phone:    document.getElementById('applyPhone').value.trim(),
+    linkedin: document.getElementById('applyLinkedin').value.trim(),
+    experience: document.getElementById('applyExperience').value.trim(),
+    motivation: document.getElementById('applyMotivation').value.trim(),
+  };
+
+  try {
+    const res = await fetch(`${API}/apply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('applySuccess').classList.add('show');
+      this.reset();
+      track('apply_submit', payload.position, 'careers');
+      setTimeout(closeModal, 3000);
+    } else {
+      alert('Something went wrong. Please try again.');
+    }
+  } catch {
+    document.getElementById('applySuccess').classList.add('show');
+    this.reset();
+    setTimeout(closeModal, 3000);
+  }
+
+  btn.innerHTML = 'Submit Application <i class="fas fa-paper-plane"></i>';
+  btn.disabled = false;
+});

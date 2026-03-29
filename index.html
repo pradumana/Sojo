@@ -320,19 +320,19 @@
           <div class="job-header"><i class="fas fa-pen-nib"></i><div><h4>Content & Communications Intern</h4><span>Remote · 3 months</span></div></div>
           <p>Help us tell our story — write blogs, manage social media, and create impact reports.</p>
           <div class="job-tags"><span>Content</span><span>Social Media</span><span>Unpaid/Stipend</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="Content & Communications Intern">Apply Now</a>
         </div>
         <div class="job-card">
           <div class="job-header"><i class="fas fa-code"></i><div><h4>Tech & Product Intern</h4><span>Remote · 3-6 months</span></div></div>
           <p>Help us build the SoLo MVP — web/app development, UX research, and product thinking.</p>
           <div class="job-tags"><span>Tech</span><span>Product</span><span>Stipend</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="Tech & Product Intern">Apply Now</a>
         </div>
         <div class="job-card">
           <div class="job-header"><i class="fas fa-chart-bar"></i><div><h4>Research & Impact Intern</h4><span>Remote · 2-3 months</span></div></div>
           <p>Support our M&E framework, conduct field research, and help us measure what matters.</p>
           <div class="job-tags"><span>Research</span><span>M&E</span><span>Unpaid</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="Research & Impact Intern">Apply Now</a>
         </div>
       </div>
     </div>
@@ -343,13 +343,13 @@
           <div class="job-header"><i class="fas fa-star"></i><div><h4>SoJo Career Fellow</h4><span>Hybrid · 6 months</span></div></div>
           <p>Lead career counseling sessions, build employer partnerships, and grow our job seeker community.</p>
           <div class="job-tags"><span>Career Dev</span><span>Partnerships</span><span>Stipend</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="SoJo Career Fellow">Apply Now</a>
         </div>
         <div class="job-card">
           <div class="job-header"><i class="fas fa-child"></i><div><h4>Resilient Street Fellow</h4><span>On-ground · 12 months</span></div></div>
           <p>Work directly with street children, local authorities, and Child Protection Departments.</p>
           <div class="job-tags"><span>Child Welfare</span><span>Field Work</span><span>Stipend</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="Resilient Street Fellow">Apply Now</a>
         </div>
       </div>
     </div>
@@ -360,13 +360,13 @@
           <div class="job-header"><i class="fas fa-users"></i><div><h4>Community Manager</h4><span>Remote · Full-time</span></div></div>
           <p>Manage and grow our WhatsApp, Telegram, and LinkedIn communities of job seekers and socialancers.</p>
           <div class="job-tags"><span>Community</span><span>Full-time</span><span>Paid</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="Community Manager">Apply Now</a>
         </div>
         <div class="job-card">
           <div class="job-header"><i class="fas fa-laptop"></i><div><h4>Full Stack Developer</h4><span>Remote · Full-time</span></div></div>
           <p>Build and scale the SoLo App and SoJo platform — React, Node.js, and mobile-first thinking.</p>
           <div class="job-tags"><span>Tech</span><span>Full-time</span><span>Paid</span></div>
-          <a href="#contact" class="btn btn-sm">Apply Now</a>
+          <a href="#" class="btn btn-sm apply-btn" data-position="Full Stack Developer">Apply Now</a>
         </div>
       </div>
     </div>
@@ -523,6 +523,50 @@
     </div>
   </div>
 </footer>
+
+<!-- APPLICATION MODAL -->
+<div class="modal-overlay" id="applyModal">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <h2 id="modalTitle">Apply Now</h2>
+    <p id="modalSubtitle" class="modal-subtitle"></p>
+    <form id="applyForm">
+      <input type="hidden" id="applyPosition" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="applyName">Full Name *</label>
+          <input type="text" id="applyName" placeholder="Your full name" required />
+        </div>
+        <div class="form-group">
+          <label for="applyEmail">Email *</label>
+          <input type="email" id="applyEmail" placeholder="your@email.com" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="applyPhone">Phone</label>
+          <input type="tel" id="applyPhone" placeholder="+91 XXXXX XXXXX" />
+        </div>
+        <div class="form-group">
+          <label for="applyLinkedin">LinkedIn Profile</label>
+          <input type="url" id="applyLinkedin" placeholder="https://linkedin.com/in/..." />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="applyExperience">Relevant Experience *</label>
+        <textarea id="applyExperience" rows="3" placeholder="Briefly describe your relevant experience..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="applyMotivation">Why do you want to join SOJO Foundation? *</label>
+        <textarea id="applyMotivation" rows="3" placeholder="Tell us what drives you..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Submit Application <i class="fas fa-paper-plane"></i></button>
+      <div class="form-success" id="applySuccess">
+        <i class="fas fa-check-circle"></i> Application submitted! We'll be in touch soon.
+      </div>
+    </form>
+  </div>
+</div>
 
 <button class="scroll-top" id="scrollTop" aria-label="Scroll to top"><i class="fas fa-arrow-up"></i></button>
 

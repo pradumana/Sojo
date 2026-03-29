@@ -25,6 +25,7 @@ if (process.env.DATABASE_URL) {
       CREATE TABLE IF NOT EXISTS page_views (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, referrer TEXT, ip TEXT, user_agent TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP);
       CREATE TABLE IF NOT EXISTS newsletter (id TEXT PRIMARY KEY, email TEXT UNIQUE, ip TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP);
       CREATE TABLE IF NOT EXISTS blogs (id TEXT PRIMARY KEY, title TEXT NOT NULL, slug TEXT UNIQUE NOT NULL, excerpt TEXT, content TEXT, category TEXT, author TEXT, cover_color TEXT DEFAULT 'linear-gradient(135deg,#667eea,#764ba2)', status TEXT DEFAULT 'draft', created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP);
+      CREATE TABLE IF NOT EXISTS applications (id TEXT PRIMARY KEY, position TEXT, name TEXT, email TEXT, phone TEXT, linkedin TEXT, experience TEXT, motivation TEXT, ip TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP);
     `);
   } catch (e) {
     console.error('SQLite init failed:', e.message);
