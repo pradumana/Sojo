@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us — SoJo Foundation</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-logo">
+        <span class="brand-logo-text">SoJo</span>
+        <span class="brand-logo-sub">SOCIAL JOBS</span>
+      </div>
+      <div class="brand-info">
+        <span class="brand-name">SoJo Foundation</span>
+        <span class="brand-tagline">Let's Get Social ✦</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="programs.html">Programs</a></li>
+      <li><a href="involved.html">Get Involved</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html" class="active nav-contact">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-content">
+    <div class="page-label">Contact Us</div>
+    <h1 class="page-title">Let's Connect</h1>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <p class="contact-intro">Have a question, want to collaborate, or just want to learn more about what we're building?</p>
+        <div class="contact-items">
+          <div class="ci">
+            <span class="ci-icon">📧</span>
+            <div>
+              <span class="ci-label">Email</span>
+              <a href="mailto:team@sojofoundation.in">team@sojofoundation.in</a>
+            </div>
+          </div>
+          <div class="ci">
+            <span class="ci-icon" style="font-size:0.75rem;font-weight:800;color:#0077b5">in</span>
+            <div>
+              <span class="ci-label">LinkedIn</span>
+              <a href="https://linkedin.com/company/socialsambhawna" target="_blank">SoJo Foundation</a>
+            </div>
+          </div>
+          <div class="ci">
+            <span class="ci-icon">📷</span>
+            <div>
+              <span class="ci-label">Instagram</span>
+              <a href="https://instagram.com/sojofoundation.in" target="_blank">@sojofoundation.in</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form" id="contactForm">
+        <h3>Send a Message</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Your name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="your@email.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="interest">I am reaching out as a…</label>
+          <select id="interest">
+            <option value="">Select</option>
+            <option>Job Seeker</option>
+            <option>Freelancer</option>
+            <option>Employer / Organisation</option>
+            <option>Volunteer</option>
+            <option>Partner</option>
+            <option>Media / Press</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" rows="5" placeholder="Your message..." required></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Send Message →</button>
+        <div class="form-success" id="formSuccess">✓ Message sent! We'll get back to you soon.</div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="page-footer">
+  <div class="pf-inner">
+    <div class="pf-brand">
+      <div class="pf-brand-icon">SoJo</div>
+      <span>SoJo Foundation</span>
+    </div>
+    <p class="pf-copy">© 2025 SoJo Foundation · Section 8, Companies Act 2013</p>
+    <nav class="pf-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="programs.html">Programs</a>
+      <a href="https://linkedin.com/company/socialsambhawna" target="_blank">LinkedIn</a>
+      <a href="https://instagram.com/sojofoundation.in" target="_blank">Instagram</a>
+    </nav>
+    <a href="admin-login.html" class="admin-link">Admin</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
